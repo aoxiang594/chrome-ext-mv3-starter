@@ -1,7 +1,7 @@
 {
   "name": "chrome-ext-mv3-starter",
-  "displayName": "[name]",
-  "description": "[description]",
+  "displayName": "WatchWA",
+  "description": "Tracking Watch Prices with AI",
   "version": "0.0.1",
   "private": true,
   "scripts": {

@@ -3,32 +3,33 @@
     <carbon-settings class="icon-btn mx-2 text-2xl" />
     <div>Options</div>
     <p class="my-2 opacity-50">
-      {{ $t('options.desc') }}
+      {{ $t("options.desc") }}
     </p>
 
     <input
       id="input"
       v-model="storageDemo"
-      :placeholder="$t('options.sync_storage')"
       :aria-label="$t('options.sync_storage')"
-      type="text"
+      :placeholder="$t('options.sync_storage')"
       autocomplete="false"
-      p="x-4 y-2"
-      w="250px"
-      text="center"
       bg="transparent"
       border="~ rounded gray-200 dark:gray-700"
       outline="none active:none"
+      p="x-4 y-2"
+      text="center"
+      type="text"
+      w="250px"
     >
 
     <Footer />
 
     <div class="mt-4">
-      {{ $t('options.powered_by_vite') }} <pixelarticons-zap class="align-middle" />
+      {{ $t("options.powered_by_vite") }}
+      <pixelarticons-zap class="align-middle" />
     </div>
   </main>
 </template>
 
-<script setup lang="ts">
-import { storageDemo } from '~/logic/storage'
+<script lang="ts" setup>
+import { storageDemo } from "~/logic/storage"
 </script>
