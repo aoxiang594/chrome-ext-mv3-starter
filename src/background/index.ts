@@ -1,6 +1,6 @@
 import { onMessage, sendMessage } from "webext-bridge"
 
-const TIME_STEP = 30 * 1000
+const TIME_STEP = 20 * 1000
 chrome.runtime.onInstalled.addListener((): void => {
     // eslint-disable-next-line no-console
     console.log("Extension installed")
@@ -45,6 +45,40 @@ onMessage("new_chat", async (message) => {
         data
     } = message
     try {
+        sendHttpRequest('https://hangqing.naochou.cn/api/heartbeat',{})
+        // const apiUrl = 'https://hangqing.naochou.cn/api/whatsapp';
+        // let params = {
+        //     text: "",
+        //     time: "",
+        //     author: {
+        //         name: "",
+        //         id: ""
+        //     }
+        //
+        // }
+        // // @ts-ignore
+        // for (let i in data) {
+        //     // @ts-ignore
+        //     let item = data[i]
+        //     params = {
+        //         author: {
+        //             name: item.toUser,
+        //             id: "13870997279"
+        //         },
+        //         text: item.text,
+        //         time: formatTimestamp(item.time)
+        //
+        //     }
+        //     console.log(params)
+        //     try {
+        //         const result = await sendHttpRequest(apiUrl, params);
+        //         console.log(result);
+        //     } catch (error) {
+        //         console.error("Failed to send HTTP request:", error.message)
+        //     }
+        // }
+
+
         // //todo post to server and log in local
         console.log(sender)
         console.log(data)
@@ -108,4 +142,42 @@ function postData(): Promise<void> {
             resolve()
         }, TIME_STEP) // 假设异步任务需要2秒钟
     })
+}
+
+//@ts-ignore
+async function sendHttpRequest(url: string, data: any): Promise<any> {
+    try {
+        const response = await fetch(url, {
+            method: "POST", // 或者 'GET'，具体取决于你的需求
+            headers: {
+                "Content-Type": "application/json" // 根据你的数据格式设置合适的 Content-Type
+                // 其他可能需要的头部信息可以在这里添加
+            },
+            body: JSON.stringify(data) // 根据你的数据格式进行序列化
+        })
+
+        if (!response.ok) {
+            throw new Error(`HTTP request failed with status ${response.status}`)
+        }
+
+        const responseData = await response.json() // 解析 JSON 响应
+        return responseData
+    } catch (error) {
+        console.error("Error sending HTTP request:", error.message)
+        throw error // 可以选择抛出异常，也可以根据需要处理错误
+    }
+}
+//@ts-ignore
+function formatTimestamp(timestamp: string | number | Date) {
+    let date = new Date(timestamp) // 将时间戳转换为 Date 对象
+
+    let year = date.getFullYear() // 获取年份
+    let month = (date.getMonth() + 1).toString().padStart(2, "0") // 获取月份，+1 是因为 getMonth() 返回的月份是从 0 开始的
+    let day = date.getDate().toString().padStart(2, "0") // 获取日期
+
+    let hours = date.getHours().toString().padStart(2, "0") // 获取小时
+    let minutes = date.getMinutes().toString().padStart(2, "0") // 获取分钟
+    let seconds = date.getSeconds().toString().padStart(2, "0") // 获取秒钟
+    //console.log(`${year}-${month}-${day} ${hours}:${minutes}:${seconds}`)
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}` // 返回格式化的日期时间字符串
 }
