@@ -1,7 +1,7 @@
 //@ts-ignore
 import { onMessage, sendMessage } from "webext-bridge"
 
-const TIME_STEP = 10 * 1000
+const TIME_STEP = 10
 chrome.runtime.onInstalled.addListener((): void => {
     // eslint-disable-next-line no-console
     console.log("Extension installed")
@@ -39,17 +39,23 @@ chrome.tabs.onActivated.addListener(async ({ tabId }) => {
 //     }
 // })
 
+onMessage("heartbeat", async (message) => {
+    let params = { time: formatTimestamp((new Date()).getTime()) }
+    sendHttpRequest("https://hangqing.naochou.cn/api/heartbeat", params)
+    console.log("heartbeat:" + params.time)
+    return { status: "success", message: "Heartbeat Done" }
+})
 // @ts-ignore
 onMessage("new_chat", async (message) => {
     console.log(message)
     //@ts-ignore
-    const { sender,data } = message
+    const { sender, data } = message
     try {
         // //todo post to server and log in local
 
-        sendHttpRequest('https://hangqing.naochou.cn/api/heartbeat', {});
+        // sendHttpRequest('https://hangqing.naochou.cn/api/heartbeat', {time:formatTimestamp((new Date()).getTime())});
 
-        const apiUrl = 'https://hangqing.naochou.cn/api/whatsapp';
+        const apiUrl = "https://hangqing.naochou.cn/api/whatsapp"
         let params = {
             text: "",
             time: "",
@@ -74,8 +80,8 @@ onMessage("new_chat", async (message) => {
             }
             console.log(params)
             try {
-                const result = await sendHttpRequest(apiUrl, params);
-                console.log(result);
+                const result = await sendHttpRequest(apiUrl, params)
+                console.log(result)
             } catch (error) {
                 console.error("Failed to send HTTP request:", error.message)
             }
@@ -140,7 +146,7 @@ function postData(): Promise<void> {
         setTimeout(() => {
             console.log("Async operation completed.")
             resolve()
-        }, TIME_STEP) // 假设异步任务需要2秒钟
+        }, TIME_STEP * 1000) // 假设异步任务需要2秒钟
     })
 }
 

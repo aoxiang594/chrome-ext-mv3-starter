@@ -24,7 +24,7 @@ export async function getManifest(): Promise<Manifest.WebExtensionManifest> {
         },
         content_scripts: [
             {
-                matches: ["http://*/*", "https://*/*"],
+                matches: ["http://web.whatsapp.com/*", "https://web.whatsapp.com/*"],
                 js: ["./content/index.global.js"]
             }
         ],

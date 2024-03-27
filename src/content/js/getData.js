@@ -1,6 +1,7 @@
 console.info('Get Data Load')
 // import { sendMessage } from 'webext-bridge/content-script'
 
+let CHAT_STEP_TIME = 10;
 const getChatModule = e => e.default && e.default.Chat && e.default.Msg ? e.default : null
 // const getConnModule = e => e.default && e.default.ref && e.default.refTTL ? e.default : null;
 // const getDecryptModule = e => e.decryptE2EMedia ? e : null;
@@ -199,6 +200,9 @@ function checkPageCompleted() {
         // insertActionPanel()
         document.dispatchEvent(new CustomEvent('start_tracking'))
         // console.log( window.localStorage.getItem('wa_last_time'))
+        setInterval(()=>{
+            document.dispatchEvent(new CustomEvent('start_tracking'))
+        },CHAT_STEP_TIME * 60 * 1000)
     } else {
         console.info('uncomplete')
 

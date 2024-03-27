@@ -3,6 +3,9 @@ import { onMessage, sendMessage } from "webext-bridge"
 
 // const messageList: string[] = []
 
+let HEARTBEAT_MINUTE_STEP_TIME  = 1;
+
+let RELOAD_MINUTE_STEP_TIME = 35;
 function injectScript(url: string) {
     const s = document.createElement("script")
     s.type = "text/javascript"
@@ -81,16 +84,19 @@ window.addEventListener("get_chat_finish", (e) => {
 
     console.log("识别到:",data)
     sendMessage("new_chat", data, "background").then(r => {
-        console.log(r)
+        // @ts-ignore
+        log(r.message)
     })
-    setTimeout(()=>{
-        document.dispatchEvent(new CustomEvent('start_tracking'))
-    },10000)
+    // setTimeout(()=>{
+    //     document.dispatchEvent(new CustomEvent('start_tracking'))
+    // },5 * 60 * 1000);//间隔 5 分钟获取一次
 })
 
 window.addEventListener("page_completed", () => {
     sendMessage("page_completed", {}, "background").then(r => {
-        console.log(r)
+        // console.log(r)
+        // @ts-ignore
+        log(r.message)
     })
 })
 
@@ -112,13 +118,40 @@ onMessage("start_tracking", async (message) => {
 //     }
 // }, 10000)
 
+function formatTimestamp(timestamp:number) {
+    let date = new Date(timestamp) // 将时间戳转换为 Date 对象
+
+    let year = date.getFullYear() // 获取年份
+    let month = (date.getMonth() + 1).toString().padStart(2, '0') // 获取月份，+1 是因为 getMonth() 返回的月份是从 0 开始的
+    let day = date.getDate().toString().padStart(2, '0') // 获取日期
+
+    let hours = date.getHours().toString().padStart(2, '0') // 获取小时
+    let minutes = date.getMinutes().toString().padStart(2, '0') // 获取分钟
+    let seconds = date.getSeconds().toString().padStart(2, '0') // 获取秒钟
+    //log(`${year}-${month}-${day} ${hours}:${minutes}:${seconds}`)
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}` // 返回格式化的日期时间字符串
+}
+
+function log(text:string) {
+    console.log(formatTimestamp((new Date()).getTime()) + ': ' + text)
+}
 
 setTimeout(()=>{
-    window.location.reload();
-}, 5 * 60 * 1000)
+    log(window.location.href);
+    window.open(window.location.href, '_self', '');
+    window.close();
+}, RELOAD_MINUTE_STEP_TIME * 60 * 1000)
 // function convertEmojiToUTF16(str: string ) {
 //     //@ts-ignore
 //     return str.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(m:string) {
 //         return m.charCodeAt(0) - 0xD800 << 10 | m.charCodeAt(1) - 0xDC00 | 0x10000;
 //     });
 // }
+
+setInterval(()=>{
+    sendMessage("heartbeat", null, "background").then(r => {
+        // @ts-ignore
+        log(r.message)
+    })
+},HEARTBEAT_MINUTE_STEP_TIME * 60 * 1000)
+
